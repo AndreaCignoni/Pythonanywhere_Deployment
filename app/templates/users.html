@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Users</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Record Addicts</h1>
+        <!-- Create User button -->
+        <button id="showCreateButton" onclick="createUser()" class="btn btn-primary">Create User</button>
+        
+        <!-- Search form -->
+        <div class="input-group mt-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by Username">
+            <button onclick="searchByUsername()" class="btn btn-outline-secondary" type="button">Search</button>
+        </div>
+        
+        <table class="table mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Gender</th>
+                    <th>Nationality</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user['id'] }}</td>
+                        <td>{{ user['fname'] }}</td>
+                        <td>{{ user['lname'] }}</td>
+                        <td>{{ user['gender'] }}</td>
+                        <td>{{ user['nationality'] }}</td>
+                        <td>{{ user['email'] }}</td>
+                        <td>{{ user['username'] }}</td>
+                        <td>
+                            <button id="updateUser{{ user.id }}" onclick="updateUser('{{ user.id }}')" class="btn btn-primary">Edit</button> <!-- Update button -->
+                            <button id="deleteUser{{ user.id }}" onclick="confirmDelete('{{ user.id }}')" class="btn btn-danger">Delete</button> <!-- Delete button -->
+                            <button id="searchUser{{ user.id }}" onclick="searchUser('{{ user.id }}')" class="btn btn-info">View Profile</button> <!-- View Profile button -->
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- JavaScript function for create user action -->
+    <script>
+        function createUser() {
+            // Redirect to registration form
+            window.location.href = '/registration_form';
+        }
+
+        // Function to delete user profile
+        function deleteUser(userId) {
+            // Send a delete request to the server
+            fetch('/users/' + userId + '/profile/delete', {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    // User cannot be deleted due to database constraints
+                    return response.json();
+                } else {
+                    throw new Error('Failed to delete user: ' + response.statusText);
+                }
+            })
+            .then(data => {
+                if (data && data.error) {
+                    // Display error message from the server
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Delete user error:', error.message);
+                alert('Before deleting this user, please be assured that his/her collection is withdrawn from platform!');
+            });
+        }
+
+        // Function to confirm user deletion
+        function confirmDelete(userId) {
+            if (confirm("Are you sure you want to delete this user?")) {
+                deleteUser(userId);
+            }
+        }
+
+        // Function to redirect to the update page
+        function updateUser(userId) {
+            // Redirect to update page with user ID
+            window.location.href = '/users/' + userId + '/profile/update';
+        }
+
+        // Function to redirect to user profile
+        function searchUser(userId) {
+            // Redirect to user profile page with user ID
+            window.location.href = '/users/' + userId + '/profile';
+        }
+
+        // Function to search user by username
+        function searchByUsername() {
+            const username = document.getElementById('searchInput').value.trim();
+            if (username !== '') {
+                window.location.href = '/users/' + username + '/profile';
+            } else {
+                alert('Please enter a username to search.');
+            }
+        }
+    </script>
+</body>
+</html>

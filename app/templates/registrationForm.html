@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Registration Form</title>
+</head>
+<body>
+    <form id="registrationForm">
+        First Name<br><input type="text" id="fname" name="fname" autocomplete="given-name" required><br>
+        Last Name<br><input type="text" id="lname" name="lname" autocomplete="family-name" required><br>
+        Gender<br>
+        male<input type="radio" id="male" name="gender" value="male">
+        female<input type="radio" id="female" name="gender" value="female"><br>
+        Nationality<br><input type="text" id="nationality" name="nationality" autocomplete="country" required><br>
+        Email<br><input type="email" id="email" name="email" autocomplete="email" required><br>
+        Username<br><input type="text" id="username" name="username" autocomplete="username" required><br>
+        Password<br><input type="password" id="password" name="password" autocomplete="new-password" required><br>
+        <button onclick="createRow()">Submit</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function createRow() {
+            var user = {};
+            var registration = document.getElementById("registrationForm");
+            user.fname = registration.querySelector('input[name="fname"]').value;
+            user.lname = registration.querySelector('input[name="lname"]').value;
+            user.gender = registration.querySelector('input[name="gender"]:checked').value;
+            user.nationality = registration.querySelector('input[name="nationality"]').value;
+            user.email = registration.querySelector('input[name="email"]').value;
+            user.username = registration.querySelector('input[name="username"]').value;
+            user.password = registration.querySelector('input[name="password"]').value;
+            
+            console.log("New user is " + JSON.stringify(user));
+
+            // Send user data to server
+            sendDataToServer(user);
+        }
+
+        function sendDataToServer(user) {
+            $.ajax({
+                url: '/registration_form',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(user),
+                success: function(response) {
+                    console.log('User data sent successfully');
+                    // Redirect to users page after successful user creation
+                    window.location.href = '/users';
+                },
+                error: function(xhr, status, error) {
+                    console.error('Failed to send user data:', status, error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

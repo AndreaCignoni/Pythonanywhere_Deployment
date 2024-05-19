@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>All Records</title>
+</head>
+<body>
+    <div class="container">
+        <h1>All Records</h1>
+        <!-- Create, Update, and Delete buttons -->
+        <div>
+            <button id="showCreateButton" onclick="showCreate()" class="btn btn-primary">Create Record</button>
+        </div>
+         <!-- Search form -->
+        <div class="input-group mt-3">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by Record Title">
+            <button onclick="searchByUsername()" class="btn btn-outline-secondary" type="button">Search</button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>record_id</th>
+                    <th>title</th>
+                    <th>author</th>
+                    <th>label</th>
+                    <th>year</th>
+                    <th>condition</th>
+                    <th>cost</th>
+                    <th>year_of_purchase</th>
+                    <th>offers</th>
+                    <th>comments</th>
+                    <th>username</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record['record_id'] }}</td>
+                    <td>{{ record['title'] }}</td>
+                    <td>{{ record['author'] }}</td>
+                    <td>{{ record['label'] }}</td>
+                    <td>{{ record['year'] }}</td>
+                    <td>{{ record['condition'] }}</td>
+                    <td>{{ record['cost'] }}</td>
+                    <td>{{ record['year_of_purchase'] }}</td>
+                    <td>{{ record['offers'] }}</td>
+                    <td>{{ record['comments'] }}</td>
+                    <td>{{ record['username'] }}</td>
+                    <td>
+                        <button class="updateRecord btn btn-secondary" onclick="updateRecord('{{record.record_id}}')">Update</button>
+                        <button class="deleteRecord btn btn-danger" onclick="deleteRecord('{{record.record_id}}')">Delete</button>
+                        <button id="searchRecord{{record.record_id }}" onclick="searchRecord('{{record.record_id }}')" class="btn btn-info">View Record Details</button> <!-- View Record Profile button -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- JavaScript function for create, update, and delete record actions -->
+    <script>
+        function showCreate() {
+            // Redirect to create record page
+            window.location.href = '/records/new';
+        }
+
+        // Other functions for update and delete actions
+        function updateRecord(recordId) {
+            // Redirect to update page with record ID
+            window.location.href = '/records/' + recordId + '/update';
+        }
+
+        // Function to delete user profile
+        function deleteRecord(recordId) {
+            // Send a delete request to the server
+            fetch('/records/' + recordId + '/delete', {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                } else if (response.status === 400) {
+                    // User cannot be deleted due to database constraints
+                    return response.json();
+                } else {
+                    throw new Error('Failed to delete recprd: ' + response.statusText);
+                }
+            })
+            .then(data => {
+                if (data && data.error) {
+                    // Display error message from the server
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Delete record error:', error.message);
+                alert('Error deleting record profile: ' + error.message);
+            });
+        }
+        // Function to redirect to user profile
+        function searchRecord(recordId) {
+        // Redirect to user profile page with user ID
+            window.location.href = '/records/' + recordId;
+        }
+
+        // Function to search user by username
+        function searchByRecordname() {
+            const title = document.getElementById('searchInput').value.trim();
+            if (title !== '') {
+                window.location.href = '/records/' + title;
+            } else {
+                alert('Please enter a title to search.');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <title>Update User Profile</title>
+</head>
+<body>
+    <h1>Users</h1>
+    <div>
+        <table class="table" id="userTable">
+            <tr>
+                    <th>id</th>
+                    <th>First Name</th>
+                    <th>Last Name </th>
+                    <th>Gender</th>
+                    <th>male</th>
+                    <th>female</th>
+                    <th>Nationality</th>
+                    <th>Email</th>
+                    <th>username</th>
+                    <th>password</th>
+
+                    <th>Update</th>
+            </tr>
+            
+        </table>
+    </div>
+    <div id='userUpdateForm' style="display: none">
+        <h2><span id="createLabel">Create a</span> <span id="updateLabel">update</span> User</h2>
+        <input type="hidden" name="id"/>
+        First Name<br><input type="text" id="fname" name="fname" autocomplete="given-name" required><br>
+        Last Name<br><input type="text" id="lname" name="lname" autocomplete="family-name" required><br>
+        Gender<br>
+        male<input type="radio" id="male" name="gender" value="male">
+        female<input type="radio" id="female" name="gender" value="female"><br>
+        Nationality<br><input type="text" id="nationality" name="nationality" autocomplete="country" required><br>
+        Email<br><input type="email" id="email" name="email" autocomplete="email" required><br>
+        Username<br><input type="text" id="username" name="username" autocomplete="username" required><br>
+        Password<br><input type="password" id="password" name="password" autocomplete="new-password" required><br>
+        <span><button id="doUpdateButton" onclick="doUpdate()">Submit</button></span>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function getUserFromForm() {
+            var form = document.getElementById('userUpdateForm');
+            if (!form) {
+                console.error("Form is null");
+                return null;
+            }
+            var user = {};
+            user.id = form.querySelector('input[name="id"]').value;
+            user.fname = form.querySelector('input[name="fname"]').value;
+            user.lname = form.querySelector('input[name="lname"]').value;
+            user.gender = form.querySelector('input[name="gender"]:checked').value;
+            user.nationality = form.querySelector('input[name="nationality"]').value;
+            user.email = form.querySelector('input[name="email"]').value;
+            user.username = form.querySelector('input[name="username"]').value;
+            user.password = form.querySelector('input[name="password"]').value;
+            console.log(JSON.stringify(user));
+            return user;
+        }
+    
+        function doUpdate() {
+            var user = getUserFromForm();
+            if (!user) {
+                console.error("User is null");
+                return;
+            }
+            updateUserAjax(user);
+        }
+    
+        function addUserToTable(user) {
+            var tableElement = document.getElementById('userTable');
+            var rowElement = tableElement.insertRow(-1);
+            rowElement.setAttribute('id', user.id);
+    
+            var cell1 = rowElement.insertCell(0);
+            cell1.innerHTML = user.id;
+    
+            var cell2 = rowElement.insertCell(1);
+            cell2.innerHTML = user.fname;
+    
+            var cell3 = rowElement.insertCell(2);
+            cell3.innerHTML = user.lname;
+    
+            var cell4 = rowElement.insertCell(3);
+            cell4.innerHTML = user.gender;
+    
+            var cell5 = rowElement.insertCell(4);
+            cell5.innerHTML = user.nationality;
+    
+            var cell6 = rowElement.insertCell(5);
+            cell6.innerHTML = user.email;
+    
+            var cell7 = rowElement.insertCell(6);
+            cell7.innerHTML = user.username;
+    
+            var cell8 = rowElement.insertCell(7);
+            cell8.innerHTML = user.password;
+    
+            var cell9 = rowElement.insertCell(8);
+            cell9.innerHTML = '<button onclick="showUpdate(this)">Update</button>';
+        }
+    
+        function clearForm() {
+            var form = document.getElementById('userUpdateForm');
+            form.reset();
+        }
+    
+        function getUserFromRow(rowElement) {
+            var user = {};
+            user.id = rowElement.getAttribute('id');
+            user.fname = rowElement.cells[1].firstChild.textContent;
+            user.lname = rowElement.cells[2].firstChild.textContent;
+            user.gender = rowElement.cells[3].firstChild.textContent;
+            user.nationality = rowElement.cells[4].firstChild.textContent;
+            user.email = rowElement.cells[5].firstChild.textContent;
+            user.username = rowElement.cells[6].firstChild.textContent;
+            user.password = rowElement.cells[7].firstChild.textContent;
+            return user;
+        }
+    
+        function setUserInRow(rowElement, user) {
+            rowElement.setAttribute('id', user.id);
+            rowElement.cells[1].firstChild.textContent = user.fname;
+            rowElement.cells[2].firstChild.textContent = user.lname;
+            rowElement.cells[3].firstChild.textContent = user.gender;
+            rowElement.cells[4].firstChild.textContent = user.nationality;
+            rowElement.cells[5].firstChild.textContent = user.email;
+            rowElement.cells[6].firstChild.textContent = user.username;
+            rowElement.cells[7].firstChild.textContent = user.password;
+        }
+    
+    
+        function populateFormWithUser(user) {
+            var form = document.getElementById('userUpdateForm');
+            form.querySelector('input[name="id"]').disabled = true;
+    
+            form.querySelector('input[name="id"]').value = user.id;
+            form.querySelector('input[name="fname"]').value = user.fname;
+            form.querySelector('input[name="lname"]').value = user.lname;
+            form.querySelector('input[name="gender"][value="' + user.gender + '"]').checked = true;
+            form.querySelector('input[name="nationality"]').value = user.nationality;
+            form.querySelector('input[name="email"]').value = user.email;
+            form.querySelector('input[name="username"]').value = user.username;
+            form.querySelector('input[name="password"]').value = user.password;
+            return user;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to update user using AJAX
+            function updateUserAjax(user) {
+                console.log('Updating user:', JSON.stringify(user));
+                var userId = parseInt(user.id);
+                var url = "users/" + encodeURI(userId) + "/profileupdate"; // Assuming 'users' is the endpoint
+                console.log('URL:', url);
+                $.ajax({ // Assuming you are using jQuery for AJAX
+                    url: url,
+                    method: 'PUT',
+                    data: JSON.stringify(user),
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success: function(result) {
+                        console.log('Update successful:', result);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Update error:', status, error);
+                    }
+                });
+            }
+
+            // Submit form on button click
+            $(document).on('submit', '#userUpdateForm', function(event) {
+                event.preventDefault();
+                doUpdate();
+            });
+
+            document.getElementById('doUpdateButton').addEventListener('click', function() {
+                doUpdate();
+            });
+
+            function doUpdate() {
+                // Get user data from the form and call updateUserAjax
+                var userData = {}; // Replace with code to get user data from the form
+                updateUserAjax(userData);
+            }
+        });
+    </script>       
+</body>
+</html>
